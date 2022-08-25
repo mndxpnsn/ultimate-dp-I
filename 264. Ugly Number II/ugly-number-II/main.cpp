@@ -7,91 +7,40 @@
 
 #include <iostream>
 #include <map>
+#include <set>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
 
-void merge(vector<int> & arr, int i, int k, int j) {
-
-    int n1 = k - i + 1;
-    int n2 = j - k;
-    int* arr1 = new int[n1 + 1];
-    int* arr2 = new int[n2 + 1];
-    int arr_index = i;
-    for(int arr1_index = 0; arr1_index < n1; ++arr1_index) {
-        arr1[arr1_index] = arr[arr_index];
-        arr_index++;
-    }
-
-    for(int arr2_index = 0; arr2_index < n2; ++arr2_index) {
-        arr2[arr2_index] = arr[arr_index];
-        arr_index++;
-    }
-
-    arr1[n1] = INT_MAX;
-    arr2[n2] = INT_MAX;
-
-    int arr1_index = 0;
-    int arr2_index = 0;
-    for(int arr_index = i; arr_index <= j; ++arr_index) {
-        if(arr1[arr1_index] >= arr2[arr2_index]) {
-            arr[arr_index] = arr2[arr2_index];
-            arr2_index++;
-        }
-        else {
-            arr[arr_index] = arr1[arr1_index];
-            arr1_index++;
-        }
-    }
-
-    //Free data
-    delete [] arr1;
-    delete [] arr2;
-}
-
-void merge_sort(vector<int> & arr, int i, int j) {
-
-    if(j - i > 0) {
-        int k = (i + j) / 2;
-        merge_sort(arr, i, k);
-        merge_sort(arr, k + 1, j);
-        merge(arr, i, k, j);
-    }
-}
-
-void merge_sort_wrap(vector<int> & input_arr) {
-
-    int n = (int) input_arr.size();
-
-    //Perform sort
-    merge_sort(input_arr, 0, n - 1);
-}
-
-void gen_numbers(long t, vector<int> & uglies, int n, long cap, map<long, long> & dp) {
+void gen_numbers(long t, set<int> & uglies, long cap, unordered_map<long, long> & dp) {
     
+    // If uglies derived from t have been computed do not proceed with computation
     if(dp[t] != 0) {
         return;
     }
     
+    // Compute all uglies less than cap
     if(t < cap) {
         long val1 = t * 2;
         long val2 = t * 3;
         long val3 = t * 5;
         
         if(val1 < cap) {
-            uglies.push_back((int) val1);
-            gen_numbers(val1, uglies, n, cap, dp);
+            uglies.insert((int) val1);
+            gen_numbers(val1, uglies, cap, dp);
         }
         if(val2 < cap) {
-            uglies.push_back((int) val2);
-            gen_numbers(val2, uglies, n, cap, dp);
+            uglies.insert((int) val2);
+            gen_numbers(val2, uglies, cap, dp);
         }
         if(val3 < cap) {
-            uglies.push_back((int) val3);
-            gen_numbers(val3, uglies, n, cap, dp);
+            uglies.insert((int) val3);
+            gen_numbers(val3, uglies, cap, dp);
         }
     }
     
+    // Set flag signaling uglies derived from t have been computed
     dp[t] = 1;
 }
 
@@ -100,38 +49,22 @@ int ugly_number_api(int n) {
     // Results are integers, and so ugly numbers are <= INT_MAX
     long cap = INT_MAX;
     
-    // Reduce cap for moderate numbers of n. Maximum value of n = 1690
-    if(1000 < n && n <= 1250) {
-        cap = cap / 9;
-    }
-    if(n <= 1000) {
-        cap = cap / 40;
-    }
-    
     // Storage for ugly numbers
-    vector<int> uglies;
-    uglies.push_back(1);
+    set<int> uglies_set;
+    uglies_set.insert(1);
     
     // Memo table
-    map<long, long> dp;
+    unordered_map<long, long> dp;
     
     // Generate ugly numbers
-    gen_numbers(1, uglies, n, cap, dp);
+    gen_numbers(1, uglies_set, cap, dp);
     
-    // Sort array of ugly numbers
-    merge_sort_wrap(uglies);
+    // Get nth element in ugly number set
+    set<int>::iterator it = uglies_set.begin();
+    advance(it, n - 1);
+    int x = *it;
     
-    // Remove duplicate ugly numbers
-    vector<int> set_arr;
-    int size_uglies = (int) uglies.size();
-    
-    for(int i = 0; i < size_uglies - 1; ++i) {
-        if(uglies[i + 1] != uglies[i]) {
-            set_arr.push_back(uglies[i]);
-        }
-    }
-    
-    return set_arr[n - 1];
+    return x;
 }
 
 int main(int argc, const char * argv[]) {
