@@ -5,11 +5,11 @@ public class Main {
         int n = 1000;
 
         // Compute min number of squares summing to n
-        Solution sol_obj = new Solution();
+        Solution solObj = new Solution();
 
-        int min_num_squares = sol_obj.num_squares(n);
+        int minNumSquares = solObj.numSquares(n);
 
         // Print results
-        System.out.println("minimum number of perfect squares: " + min_num_squares);
+        System.out.println("minimum number of perfect squares: " + minNumSquares);
     }
 }

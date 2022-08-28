@@ -22,66 +22,46 @@ class Solution {
         return res;
     }
 
-    int min_coin_rec(int[] coins, int amount, boolean[] hit_target, Map<Integer, Integer> dp) {
+    int minCoinRec(int[] coins, int amount, Map<Integer, Integer> dp) {
 
         int n = coins.length;
 
         int res = Integer.MAX_VALUE;
 
-        // Get data from memo table if available
-        Integer elem = dp.get(amount);
+        // Get results from memo table if available
+        Integer elem = (Integer) dp.get(amount);
         if(elem != null) {
             return elem;
         }
 
-        // Target sum achieved
+        // If target sum can be achieved return 0
         if(amount == 0) {
-            hit_target[0] = true;
             return 0;
         }
 
-        // Target sum missed
+        // If target sum is missed, set result to arbitrary large number < 2^31 - 1
         if(amount < 0) {
-            return Integer.MAX_VALUE / 10;
+            return Integer.MAX_VALUE - 1;
         }
 
-        // Compute minimum number of coins required to make amount
+        // Compute minimum number of coins needed to make amount
         for(int i = 0; i < n; ++i) {
-            int res_loc = 1 + min_coin_rec(coins, amount - coins[i], hit_target, dp);
+            int res_loc = 1 + minCoinRec(coins, amount - coins[i], dp);
             res = min(res, res_loc);
         }
 
+        // If no minimum number of coins adds to target return 0
         if(res == Integer.MAX_VALUE) {
             return 0;
         }
 
-        // Store data in memo table
+        // Store results in memo table
         dp.put(amount, res);
 
         return res;
     }
 
-    int coin_change_api(int[] coins, int amount) {
-
-        Map<Integer, Integer> dp = new HashMap<>();
-
-        boolean[] hit_target = {false};
-
-        int min_coins = min_coin_rec(coins, amount, hit_target, dp);
-
-        if(!hit_target[0]) {
-            min_coins = -1;
-        }
-
-        return min_coins;
-    }
-
-    public int coin_change(int[] coins, int amount) {
-
-        return coin_change_api(coins, amount);
-    }
-
-    void make_coins_array(int[] coins) {
+    void makeCoinsArray(int[] coins) {
 
         int n = coins.length;
 
@@ -90,14 +70,22 @@ class Solution {
         }
     }
 
-    public int num_squares(int n) {
+    public int numSquares(int n) {
 
         int max_num = MAX_COIN;
 
+        // Transform input to input for "Coin Change" problem
         int[] coins = new int[max_num];
 
-        make_coins_array(coins);
+        // Make square coins array
+        makeCoinsArray(coins);
 
-        return coin_change(coins, n);
+        // Memo table
+        Map<Integer, Integer> dp = new HashMap<>();
+
+        // Compute fewest number of coins required to make n
+        int minCoins = minCoinRec(coins, n, dp);
+
+        return minCoins;
     }
 }
