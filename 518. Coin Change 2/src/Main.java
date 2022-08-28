@@ -7,11 +7,11 @@ public class Main {
         int[] coins = {1, 2, 5};
 
         // Compute the number of ways to make target
-        Solution sol_obj = new Solution();
+        Solution solObj = new Solution();
 
-        int num_ways = sol_obj.change(amount, coins);
+        int numWays = solObj.change(amount, coins);
 
         // Print results
-        System.out.println("number of ways to make change: " + num_ways);
+        System.out.println("number of ways to make change: " + numWays);
     }
 }
