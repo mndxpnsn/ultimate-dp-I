@@ -6,11 +6,21 @@
 //
 
 #include <iostream>
+#include <math.h>
 #include <vector>
 
 using namespace std;
 
 class Solution {
+    
+    int min(int a, int b) {
+        int res = 0;
+        
+        if(a < b) res = a;
+        else res = b;
+        
+        return res;
+    }
     
     int max(int a, int b) {
         int res = 0;
@@ -21,39 +31,53 @@ class Solution {
         return res;
     }
     
-    int size_sq(vector<vector<char>> & matrix, int row, int col, int n) {
+    int num_sq(vector<vector<char>> & matrix, int row, int col, int n) {
         int size_square = 0;
         int num_ones = 0;
 
         int n_r = (int) matrix.size();
         int n_c = (int) matrix[0].size();
 
-        for(int r = row; (r < row + n) && r < n_r; ++r) {
-            for(int c = col; (c < col + n) && c < n_c; ++c) {
-                if(matrix[r][c] == '1') {
-                    num_ones++;
-                }
+        // Count number of ones in column n - 1 + col
+        for(int r = n - 1 + row; r < n_r && r >= row && n - 1 + col < n_c; --r) {
+            if(matrix[r][n - 1 + col] == '1') {
+                num_ones++;
             }
         }
 
-        bool all_ones = num_ones == n * n;
+        // Count number of ones in row n - 1 + row
+        for(int c = n - 2 + col; c < n_c && c >= col && n - 1 + row < n_r; --c) {
+            if(matrix[n - 1 + row][c] == '1') {
+                num_ones++;
+            }
+        }
+        
+        // Check if a square matrix of ones is formed
+        bool all_ones = num_ones + (n - 1) * (n - 1) == n * n;
 
+        // Check for larger square matrix with all ones
         if(all_ones) {
-            size_square = max(n * n, size_sq(matrix, row, col, n + 1));
+            size_square = max(n * n, num_sq(matrix, row, col, n + 1));
         }
 
         return size_square;
     }
 
-    int max_size_squares(vector<vector<char>> & matrix) {
+    int count_squares(vector<vector<char>> & matrix) {
         int size_squares = 0;
 
         int m = (int) matrix.size();
         int n = (int) matrix[0].size();
 
+        // Compute the largest square matrix with all ones
         for(int r = 0; r < m; ++r) {
             for(int c = 0; c < n; ++c) {
-                size_squares = max(size_squares, size_sq(matrix, r, c, 1));
+                size_squares = max(size_squares, num_sq(matrix, r, c, 1));
+                // If largest square has been found, return square
+                int size_len = sqrt(size_squares);
+                if(size_len > m - r + 1) {
+                    return size_squares;
+                }
             }
         }
 
@@ -99,17 +123,18 @@ public:
         int m = (int) matrix.size();
         int n = (int) matrix[0].size();
         
-        // Trivial case where all elements are zeros
+        if(all_elements_are_ones(matrix)) {
+            
+            int x = min(m, n);
+            
+            return x * x;
+        }
+        
         if(all_elements_are_zeros(matrix)) {
             return 0;
         }
         
-        // Trivial case where all elements are ones and matrix is square matrix
-        if(all_elements_are_ones(matrix) && m == n) {
-            return m * n;
-        }
-        
-        return max_size_squares(matrix);
+        return count_squares(matrix);
     }
 };
 
