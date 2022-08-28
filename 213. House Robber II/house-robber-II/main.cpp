@@ -10,76 +10,87 @@
 
 using namespace std;
 
-typedef struct memo_table {
-    bool is_set;
-    int val;
-} m_table;
+int * dp1;
+int * dp2;
 
-m_table ** table1;
-m_table ** table2;
-
-void init_memo_table(int n) {
-    table1 = new m_table * [n + 1];
-    table2 = new m_table * [n + 1];
+void init_dp_tables(int n) {
+    dp1 = new int[n + 1];
+    dp2 = new int[n + 1];
     for(int i = 0; i < n + 1; ++i) {
-        table1[i] = new m_table[2];
-        table2[i] = new m_table[2];
-    }
-    
-    for(int i = 0; i < n + 1; ++i) {
-        for(int j = 0; j < 2; ++j) {
-            table1[i][j].is_set = false;
-            table1[i][j].val = 0;
-            table2[i][j].is_set = false;
-            table2[i][j].val = 0;
-        }
+        dp1[i] = -1;
+        dp2[i] = -1;
     }
 }
+
+void delete_dp_tables(int n) {
+    
+    delete [] dp1;
+    delete [] dp2;
+}
+
 int max(int a, int b) {
     int res = 0;
+    
     if(a > b) { res = a; }
     else { res = b; }
     
     return res;
 }
 
-int rob_calc(int n, vector<int> & nums, int c, bool robbed_neighbor, m_table ** table) {
+int rob_calc(int n, vector<int> & nums, int c, int * dp) {
     int loot = 0;
     
+    // Only one house on the street
     if(n == 1) {
         return nums[0];
     }
     
+    // Index out of bounds
     if(c >= n) {
         return 0;
     }
     
-    if(table[c][robbed_neighbor].is_set) {
-        return table[c][robbed_neighbor].val;
+    // Get results from memo table if available
+    if(dp[c] != -1) {
+        return dp[c];
     }
           
+    // Compute max loot
     if(c < n) {
-        if(!robbed_neighbor) {
-            loot = max(loot, nums[c] + rob_calc(n, nums, c + 1, true, table));
-            loot = max(loot, rob_calc(n, nums, c + 1, false, table));
-        }
-        if(robbed_neighbor) {
-            loot = max(loot, rob_calc(n, nums, c + 1, false, table));
-        }
+        // Loot current house and skip neighbor
+        int val1 = nums[c] + rob_calc(n, nums, c + 2, dp);
+        // Skip current house
+        int val2 =  rob_calc(n, nums, c + 1, dp);
+        
+        // Get max of choices
+        loot = max(loot, val1);
+        loot = max(loot, val2);
     }
     
-    table[c][robbed_neighbor].is_set = true;
-    table[c][robbed_neighbor].val = loot;
+    // Store results in memo table
+    dp[c] = loot;
     
     return loot;
 }
 
 int rob(vector<int> & nums) {
+    
     int n = (int) nums.size();
     
-    init_memo_table(n);
+    // Initialize memo tables
+    init_dp_tables(n);
     
-    int res = max(rob_calc(n - 1, nums, 0, false, table1), rob_calc(n, nums, 1, false, table2));
+    // Compute max loot if first house is considered for looting
+    int val1 = rob_calc(n - 1, nums, 0, dp1);
+    
+    // Compute max loot if first house is not considered for looting
+    int val2 = rob_calc(n, nums, 1, dp2);
+    
+    // Compute max loot
+    int res = max(val1, val2);
+    
+    // Delete memo tables
+    delete_dp_tables(n);
     
     return res;
 }
