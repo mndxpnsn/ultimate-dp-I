@@ -8,11 +8,12 @@ public class Main {
         int[] prices = {1, 3, 2, 8, 4, 9};
 
         // Compute max profit with transaction fee
-        Solution sol_obj = new Solution();
+        Solution solObj = new Solution();
 
-        int max_profit = sol_obj.max_profit(prices, fee);
+        int profit = solObj.maxProfit(prices, fee);
 
         // Print results
-        System.out.println("max profit obtained: " + max_profit);
+        System.out.println("max profit obtained: " + profit);
+        System.out.println("number of operations: " + solObj.ops);
     }
 }
