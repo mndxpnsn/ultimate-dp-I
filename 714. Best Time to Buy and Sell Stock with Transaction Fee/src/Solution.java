@@ -22,9 +22,9 @@ public class Solution {
         if(day <= n - 1) {
             // We own stock
             if(have == 1) {
-                // Sell stock
+                // Sell stock now
                 int prof1 = p[day] - fee + maxProfitRec(p, fee, day + 1, 0, dp);
-                // Sell stock at a later day
+                // Sell stock later
                 int prof2 = maxProfitRec(p, fee, day + 1, 1, dp);
 
                 profit = Math.max(profit, prof1);
@@ -32,7 +32,7 @@ public class Solution {
             }
             // We do not own stock
             if(have == 0) {
-                // Buy stock on day j
+                // Buy stock now
                 int prof1 = -p[day] + maxProfitRec(p, fee, day + 1, 1, dp);
                 // Buy stock later
                 int prof2 = maxProfitRec(p, fee, day + 1, 0, dp);
