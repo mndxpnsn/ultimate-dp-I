@@ -1,12 +1,12 @@
 public class Main {
 
-    static void init_mat(int[][] mat, int min, int max) {
+    static void initMat(int[][] mat, int min, int max) {
         int m = mat.length;
         int n = mat[0].length;
 
         for(int i = 0; i < m; ++i) {
             for(int j = 0; j < n; ++j) {
-                mat[i][j] = i * (j + 3) % m ;//min + (int)(Math.random() * ((max - min) + 1));
+                mat[i][j] = min + (int)(Math.random() * ((max - min) + 1));
             }
         }
     }
@@ -30,12 +30,12 @@ public class Main {
         // Declare and initialize input matrix
         int[][] mat = new int[m][n];
 
-        init_mat(mat, min, max);
+        initMat(mat, min, max);
 
         // Compute sum of query
-        NumMatrix sol_obj = new NumMatrix(mat);
+        NumMatrix solObj = new NumMatrix(mat);
 
-        int sum_query = sol_obj.sum_region(row1, col1, row2, col2);
+        int sum_query = solObj.sumRegion(row1, col1, row2, col2);
 
         // Print results
         System.out.println("sum of query: " + sum_query);
